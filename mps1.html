@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blue Dart Label Generator</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      background: #fff;
+      padding: 30px;
+      margin: 40px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #1a237e;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      margin-right: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #3949ab;
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #303f9f;
+    }
+
+    .button-group {
+      text-align: center;
+    }
+
+    /* Hidden printable section */
+    #printSection {
+      display: none;
+      white-space: pre-wrap;
+      font-family: monospace;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      #printSection, #printSection * {
+        visibility: visible;
+      }
+
+      #printSection {
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Blue Dart MPS Label Printing</h2>
+
+  <label>AWB Number:</label>
+  <input type="number" id="num" placeholder="Enter the AWB Number">
+
+  <label>Origin / Destination :</label>
+  <input type="text" id="org" placeholder="MAA">
+  <input type="text" id="dst" placeholder="BLR">
+
+  <label>No. of Pieces:</label>
+  <input type="number" id="num1" placeholder="Count">
+
+  <label>Reference No:</label>
+  <input type="text" id="ref" placeholder="Reference">
+
+  <div class="button-group">
+    <button onclick="mps()">Generate</button>
+    <button onclick="printOutput()">Print</button>
+    <button onclick="downloadOutput()">Download</button>
+
+  </div>
+</div>
+
+<!-- Hidden print area -->
+<div id="printSection"></div>
+
+<script>
+  let allOutput = "";
+
+  function mps() {
+    let a = document.getElementById("num").value;
+    let b = parseInt(document.getElementById("num1").value);
+    let org = document.getElementById("org").value;
+    let dst = document.getElementById("dst").value;
+    let ref = document.getElementById("ref").value;
+
+    // Reset input fields
+    document.getElementById("num").value = "";
+    document.getElementById("org").value = "";
+    document.getElementById("dst").value = "";
+    document.getElementById("ref").value = "";
+    document.getElementById("num1").value = "";
+
+    allOutput = "";
+
+    for (let i = 1; i <= b; i++) {
+      let k = a + "-" + i.toString().padStart(4, '0');
+      allOutput += `REFERENCE 0,0\nDIRECTION 1\nSPEED 3.0\nGAP 0.12,0\nSIZE 89mm 60mm\nSET PEEL OFF\nDENSITY 8\nCLS\nCLS\nTEXT 31,30,"3",0,2,2,"BLUE DART"\nTEXT 31,40,"3",0,2,2,"____________________"\nTEXT 128,168,"2",0,2,2," ${k}"\nTEXT 31,178,"3",0,2,2,"____________________"\nBARCODE 110,110,"128",46,0,0,3,0,"${k}"\nTEXT 31,250,"2",0,2,2,"Dstn: ${org.toUpperCase()} - ${dst.toUpperCase()}"\nTEXT 31,300,"2",0,2,2,"Pcs : ${b} of ${i}" \nTEXT 31,350,"2",0,2,2,"Awb :${a}"\nTEXT 31,400,"2",0,2,2,"Ref : ${ref}"\nPRINT 1,1 \n\n`;
+    }
+
+    document.getElementById("printSection").textContent = allOutput;
+  }
+
+  function downloadOutput() {
+    const blob = new Blob([allOutput], { type: 'text/plain' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "output.txt";
+    link.click();
+  }
+
+  function printOutput() {
+    if (!allOutput) {
+      alert("Please generate labels first.");
+      return;
+    }
+    window.print();
+  }
+</script>
+
+</body>
+</html>
