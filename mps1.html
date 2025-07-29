@@ -63,11 +63,12 @@
       text-align: center;
     }
 
-    /* Hidden printable section */
     #printSection {
       display: none;
       white-space: pre-wrap;
       font-family: monospace;
+      background: white;
+      padding: 20px;
     }
 
     @media print {
@@ -80,6 +81,7 @@
       }
 
       #printSection {
+        display: block;
         position: absolute;
         left: 0;
         top: 0;
@@ -106,10 +108,9 @@
   <input type="text" id="ref" placeholder="Reference">
 
   <div class="button-group">
-    <button onclick="mps()">Generate</button>
-    <button onclick="printOutput()">Print</button>
-    <button onclick="downloadOutput()">Download</button>
-
+    <button type="button" onclick="mps()">Generate</button>
+    <button type="button" onclick="printOutput()">Print</button>
+    <button type="button" onclick="downloadOutput()">Download</button>
   </div>
 </div>
 
@@ -140,7 +141,7 @@
       allOutput += `REFERENCE 0,0\nDIRECTION 1\nSPEED 3.0\nGAP 0.12,0\nSIZE 89mm 60mm\nSET PEEL OFF\nDENSITY 8\nCLS\nCLS\nTEXT 31,30,"3",0,2,2,"BLUE DART"\nTEXT 31,40,"3",0,2,2,"____________________"\nTEXT 128,168,"2",0,2,2," ${k}"\nTEXT 31,178,"3",0,2,2,"____________________"\nBARCODE 110,110,"128",46,0,0,3,0,"${k}"\nTEXT 31,250,"2",0,2,2,"Dstn: ${org.toUpperCase()} - ${dst.toUpperCase()}"\nTEXT 31,300,"2",0,2,2,"Pcs : ${b} of ${i}" \nTEXT 31,350,"2",0,2,2,"Awb :${a}"\nTEXT 31,400,"2",0,2,2,"Ref : ${ref}"\nPRINT 1,1 \n\n`;
     }
 
-    document.getElementById("printSection").textContent = allOutput;
+    document.getElementById("printSection").innerHTML = `<pre>${allOutput}</pre>`;
   }
 
   function downloadOutput() {
