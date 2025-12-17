@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Blue Dart Label Generator</title>
+
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      background: #fff;
+      padding: 30px;
+      margin: 40px auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #1a237e;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    /* RADIO BUTTONS RIGHT */
+    .radio-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 10px;
+    }
+
+    .radio-label {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .radio-options {
+      display: flex;
+      gap: 12px;
+    }
+
+    .radio-options label {
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+      cursor: pointer;
+      margin-top: 0;
+    }
+
+    .radio-options input[type="radio"] {
+      width: auto;
+      margin-right: 5px;
+    }
+
+    button {
+      margin-top: 20px;
+      margin-right: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #3949ab;
+      color: white;
+    }
+
+    button:hover {
+      background-color: #303f9f;
+    }
+
+    .button-group {
+      text-align: center;
+    }
+
+    #printSection {
+      display: none;
+      white-space: pre-wrap;
+      font-family: monospace;
+      background: white;
+      padding: 20px;
+    }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+
+      #printSection, #printSection * {
+        visibility: visible;
+      }
+
+      #printSection {
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>Blue Dart MPS Label Printing</h2>
+
+  <!-- PRINT LOGO OPTION -->
+  <div class="radio-row">
+    <span class="radio-label">Print With BD Logo</span>
+    <div class="radio-options">
+      <label>
+        <input type="radio" name="answer" value="yes">
+        Yes
+      </label>
+      <label>
+        <input type="radio" name="answer" value="no" checked>
+        No
+      </label>
+    </div>
+  </div>
+
+  <label>AWB Number:</label>
+  <input type="number" id="num" placeholder="Enter the AWB Number">
+
+  <label>Origin / Destination :</label>
+  <input type="text" id="org" placeholder="MAA / STR">
+  <input type="text" id="dst" placeholder="BLR / APT">
+
+  <label>No. of Pieces:</label>
+  <input type="number" id="num1" placeholder="Count">
+
+  <label>Reference No:</label>
+  <input type="text" id="ref" placeholder="Reference">
+
+  <div class="button-group">
+    <button onclick="mps()">Generate</button>
+    <button onclick="printOutput()">Print</button>
+    <button onclick="downloadOutput()">Download</button>
+  </div>
+</div>
+
+
+
+<!-- Hidden print area -->
+<div id="printSection"></div>
+
+<script>
+  let allOutput = "";
+
+  function clearForm() {
+    document.getElementById("num").value = "";
+    document.getElementById("org").value = "";
+    document.getElementById("dst").value = "";
+    document.getElementById("num1").value = "";
+    document.getElementById("ref").value = "";
+    document.querySelector('input[name="answer"][value="no"]').checked = true;
+  }
+
+  function mps() {
+    let a = document.getElementById("num").value;
+    let b = parseInt(document.getElementById("num1").value);
+    let org = document.getElementById("org").value;
+    let dst = document.getElementById("dst").value;
+    let ref = document.getElementById("ref").value;
+
+    if (!a || !b) {
+      alert("Please enter AWB Number and Pieces count.");
+      return;
+    }
+
+    let printWithLogo = document.querySelector('input[name="answer"]:checked').value;
+
+    allOutput = "";
+
+    for (let i = 1; i <= b; i++) {
+      let k = a + "-" + i.toString().padStart(4, '0');
+
+      let logoBlock = printWithLogo === "yes"
+        ? `TEXT 31,30,"3",0,2,2,"BLUE DART"
+BAR 31,55,500,3
+`
+        : "";
+
+      allOutput += `REFERENCE 0,0
+DIRECTION 1
+SPEED 3.0
+GAP 0.12,0
+SIZE 89mm 60mm
+SET PEEL OFF
+DENSITY 8
+CLS
+CLS
+${logoBlock}
+TEXT 128,168,"2",0,2,2,"${k}"
+BAR 31,188,500,3
+BARCODE 110,110,"128",46,0,0,3,0,"${k}"
+TEXT 31,250,"2",0,2,2,"Dstn: ${org.toUpperCase()} - ${dst.toUpperCase()}"
+TEXT 31,300,"2",0,2,2,"Pcs : ${i} of ${b}"
+TEXT 31,350,"2",0,2,2,"Awb : ${a}"
+TEXT 31,400,"2",0,2,2,"Ref : ${ref}"
+PRINT 1,1
+
+`;
+    }
+
+
+ document.getElementById("printSection").innerHTML = `<pre>${allOutput}</pre>`;
+
+    // CLEAR FORM AFTER GENERATE
+    clearForm();
+  }
+
+  function printOutput() {
+    if (!allOutput) {
+      alert("Please generate labels first.");
+      return;
+    }
+
+    window.print();
+
+    // CLEAR FORM AFTER PRINT
+    clearForm();
+  }
+
+  function downloadOutput() {
+    if (!allOutput) {
+      alert("Please generate labels first.");
+      return;
+    }
+
+    const blob = new Blob([allOutput], { type: 'text/plain' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "output.txt";
+    link.click();
+  }
+</script>
+
+</body>
+</html>
