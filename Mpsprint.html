@@ -200,7 +200,7 @@
 
       let logoBlock = printWithLogo === "yes"
         ? `TEXT 31,30,"3",0,2,2,"BLUE DART"
-BAR 31,55,500,3
+BAR 31,85,700,3
 `
         : "";
 
@@ -215,9 +215,9 @@ CLS
 CLS
 ${logoBlock}
 TEXT 128,168,"2",0,2,2,"${k}"
-BAR 31,220,630,3
+BAR 31,220,700,3
 BARCODE 110,110,"128",46,0,0,3,0,"${k}"
-TEXT 31,250,"2",0,2,2,"Dstn: ${org.toUpperCase()} - ${dst.toUpperCase()}"
+TEXT 31,250,"2",0,2,2,"Dest: ${org.toUpperCase()} - ${dst.toUpperCase()}"
 TEXT 31,300,"2",0,2,2,"Pcs : ${i} of ${b}"
 TEXT 31,350,"2",0,2,2,"Awb : ${a}"
 TEXT 31,400,"2",0,2,2,"Ref : ${ref}"
@@ -261,4 +261,5 @@ PRINT 1,1
 
 </body>
 </html>
+
 
